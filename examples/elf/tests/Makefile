@@ -1,6 +1,8 @@
 ############################################################################
 # apps/examples/elf/tests/Makefile
 #
+# SPDX-License-Identifier: Apache-2.0
+#
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.  The
@@ -85,7 +87,8 @@ $(ROMFS_IMG): install
 
 $(FSIMG_SRC): $(ROMFS_IMG)
 	$(Q) (cd $(TESTS_DIR) && echo "#include <nuttx/compiler.h>" >$@ && \
-		xxd -i romfs.img | sed -e "s/^unsigned char/const unsigned char aligned_data(4)/g" >>$@)
+		xxd -i romfs.img | sed -e "s/^unsigned char/const unsigned char aligned_data(4)/g" | \
+		sed -e "s/romfs_img/elf_romfs_img/g" >>$@)
 
 else
 # Make sure that the NuttX gencromfs tool has been built

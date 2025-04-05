@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/nshlib/nsh_command.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -162,10 +164,8 @@ static const struct cmdmap_s g_cmdmap[] =
     "[<path> [<path> [<path> ...]]]"),
 #endif
 
-#ifndef CONFIG_DISABLE_ENVIRON
-#  ifndef CONFIG_NSH_DISABLE_CD
+#ifndef CONFIG_NSH_DISABLE_CD
   CMD_MAP("cd",       cmd_cd,       1, 2, "[<dir-path>|-|~|..]"),
-#  endif
 #endif
 
 #ifndef CONFIG_NSH_DISABLE_CP
@@ -186,9 +186,9 @@ static const struct cmdmap_s g_cmdmap[] =
 #endif
 
 #ifndef CONFIG_NSH_DISABLE_DD
-  CMD_MAP("dd",       cmd_dd,       3, 7,
+  CMD_MAP("dd",       cmd_dd,       1, 7,
     "if=<infile> of=<outfile> [bs=<sectsize>] [count=<sectors>] "
-    "[skip=<sectors>] [seek=<sectors>] [verify]"),
+    "[skip=<sectors>] [seek=<sectors>] [verify] [conv=<nocreat,notrunc>]"),
 #endif
 
 #if defined(CONFIG_NET) && defined(CONFIG_NET_ROUTE) && !defined(CONFIG_NSH_DISABLE_DELROUTE)
@@ -474,7 +474,8 @@ static const struct cmdmap_s g_cmdmap[] =
 #endif
 
 #ifndef CONFIG_NSH_DISABLE_PS
-  CMD_MAP("ps",       cmd_ps,       1, 1, NULL),
+  CMD_MAP("ps",       cmd_ps,       1, CONFIG_NSH_MAXARGUMENTS,
+    "<-heap> <pid1 pid2 ...>"),
 #endif
 
 #ifdef CONFIG_NET_UDP
@@ -484,10 +485,8 @@ static const struct cmdmap_s g_cmdmap[] =
 #  endif
 #endif
 
-#ifndef CONFIG_DISABLE_ENVIRON
-#  ifndef CONFIG_NSH_DISABLE_PWD
+#ifndef CONFIG_NSH_DISABLE_PWD
   CMD_MAP("pwd",      cmd_pwd,      1, 1, NULL),
-#  endif
 #endif
 
 #if !defined(CONFIG_NSH_DISABLE_READLINK) && defined(CONFIG_PSEUDOFS_SOFTLINKS)
@@ -594,6 +593,11 @@ static const struct cmdmap_s g_cmdmap[] =
           3, CONFIG_NSH_MAXARGUMENTS, "<expression>"),
 #endif
 
+#if !defined(CONFIG_NSH_DISABLE_TOP) && defined(NSH_HAVE_CPULOAD)
+  CMD_MAP("top",       cmd_top,       1, 5,
+          "[ -n <num> ][ -d <delay>] [ -p <pidlist>] [-h]"),
+#endif
+
 #ifndef CONFIG_NSH_DISABLE_TIME
   CMD_MAP("time",     cmd_time,     2, 2, "\"<command>\""),
 #endif
@@ -658,6 +662,11 @@ static const struct cmdmap_s g_cmdmap[] =
   CMD_MAP("usleep",   cmd_usleep,   2, 2, "<usec>"),
 #endif
 
+#ifndef CONFIG_NSH_DISABLE_WATCH
+  CMD_MAP("watch",     cmd_watch,
+          2, 6, "[-n] interval [-c] count <command>"),
+#endif
+
 #ifdef CONFIG_NET_TCP
 #  ifndef CONFIG_NSH_DISABLE_WGET
   CMD_MAP("wget",     cmd_wget,     2, 4, "[-o <local-path>] <url>"),
@@ -666,6 +675,12 @@ static const struct cmdmap_s g_cmdmap[] =
 
 #ifndef CONFIG_NSH_DISABLE_XD
   CMD_MAP("xd",       cmd_xd,       3, 3, "<hex-address> <byte-count>"),
+#endif
+#if !defined(CONFIG_NSH_DISABLE_WAIT) && defined(CONFIG_SCHED_WAITPID) && \
+    !defined(CONFIG_DISABLE_PTHREAD) && defined(CONFIG_FS_PROCFS) && \
+    !defined(CONFIG_FS_PROCFS_EXCLUDE_PROCESS)
+  CMD_MAP("wait",     cmd_wait,     1, CONFIG_NSH_MAXARGUMENTS,
+          "pid1 [pid2 [pid3] ...]"),
 #endif
   CMD_MAP(NULL,       NULL,         1, 1, NULL)
 };

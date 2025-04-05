@@ -1,6 +1,8 @@
 # ##############################################################################
 # apps/graphics/lvgl/CMakeLists.txt
 #
+# SPDX-License-Identifier: Apache-2.0
+#
 # Licensed to the Apache Software Foundation (ASF) under one or more contributor
 # license agreements.  See the NOTICE file distributed with this work for
 # additional information regarding copyright ownership.  The ASF licenses this
@@ -29,24 +31,11 @@ if(CONFIG_GRAPHICS_LVGL)
     FetchContent_Declare(
       lvgl_fetch
       DOWNLOAD_DIR ${CMAKE_CURRENT_LIST_DIR}
-      URL "https://github.com/lvgl/lvgl/archive/refs/tags/v9.1.0.zip"
-          SOURCE_DIR
-          ${CMAKE_CURRENT_LIST_DIR}/lvgl
-          BINARY_DIR
+      URL "https://github.com/lvgl/lvgl/archive/refs/tags/v9.2.1.zip" SOURCE_DIR
+          ${CMAKE_CURRENT_LIST_DIR}/lvgl BINARY_DIR
           ${CMAKE_BINARY_DIR}/apps/graphics/lvgl/lvgl
-          CONFIGURE_COMMAND
-          ""
-          BUILD_COMMAND
-          ""
-          INSTALL_COMMAND
-          ""
-          TEST_COMMAND
-          ""
-      PATCH_COMMAND
-        patch -p1 -s -d ${CMAKE_CURRENT_LIST_DIR}/lvgl <
-        ${CMAKE_CURRENT_LIST_DIR}/0001-fix-demo-fix-compile-warning.patch
       DOWNLOAD_NO_PROGRESS true
-      TIMEOUT 30)
+      TIMEOUT 120)
 
     FetchContent_GetProperties(lvgl_fetch)
 

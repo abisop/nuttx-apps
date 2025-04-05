@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/netutils/netinit/netinit.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -904,7 +906,7 @@ static int netinit_monitor(void)
 
               ninfo("Taking the link down\n");
 
-              ifr.ifr_flags = IFF_DOWN;
+              ifr.ifr_flags = 0;
               ret = ioctl(sd, SIOCSIFFLAGS, (unsigned long)&ifr);
               if (ret < 0)
                 {

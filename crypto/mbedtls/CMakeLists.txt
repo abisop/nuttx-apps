@@ -1,6 +1,8 @@
 # ##############################################################################
 # apps/crypto/mbedtls/CMakeLists.txt
 #
+# SPDX-License-Identifier: Apache-2.0
+#
 # Licensed to the Apache Software Foundation (ASF) under one or more contributor
 # license agreements.  See the NOTICE file distributed with this work for
 # additional information regarding copyright ownership.  The ASF licenses this
@@ -38,6 +40,8 @@ if(CONFIG_CRYPTO_MBEDTLS)
         ${CMAKE_CURRENT_LIST_DIR}/0001-mbedtls-entropy_poll-use-getrandom-to-get-the-system.patch
         && patch -p1 -d ${MBEDTLS_DIR} <
         ${CMAKE_CURRENT_LIST_DIR}/0002-mbedtls-add-mbedtls-x509-crt-pool.patch
+        && patch -p1 -d ${MBEDTLS_DIR} <
+        ${CMAKE_CURRENT_LIST_DIR}/0003-Fix-MBEDTLS_SSL_DTLS_CONNECTION_ID_COMPAT-warning.patch
       DOWNLOAD_NO_PROGRESS true
       TIMEOUT 30)
 
@@ -90,6 +94,14 @@ if(CONFIG_CRYPTO_MBEDTLS)
       list(APPEND CSRCS ${CMAKE_CURRENT_LIST_DIR}/source/md5_alt.c)
     endif()
 
+    if(CONFIG_MBEDTLS_POLY1305_ALT)
+      list(APPEND CSRCS ${CMAKE_CURRENT_LIST_DIR}/source/poly1305_alt.c)
+    endif()
+
+    if(CONFIG_MBEDTLS_RIPEMD160_ALT)
+      list(APPEND CSRCS ${CMAKE_CURRENT_LIST_DIR}/source/ripemd160_alt.c)
+    endif()
+
     if(CONFIG_MBEDTLS_SHA1_ALT)
       list(APPEND CSRCS ${CMAKE_CURRENT_LIST_DIR}/source/sha1_alt.c)
     endif()
@@ -100,6 +112,10 @@ if(CONFIG_CRYPTO_MBEDTLS)
 
     if(CONFIG_MBEDTLS_SHA512_ALT)
       list(APPEND CSRCS ${CMAKE_CURRENT_LIST_DIR}/source/sha512_alt.c)
+    endif()
+
+    if(CONFIG_MBEDTLS_BIGNUM_ALT)
+      list(APPEND CSRCS ${CMAKE_CURRENT_LIST_DIR}/source/bignum_alt.c)
     endif()
 
   endif()

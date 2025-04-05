@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/nshlib/nsh_console.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -45,9 +47,13 @@
 
 struct serialsave_s
 {
+#ifdef CONFIG_NSH_ALTCONDEV
+  int   cn_confd;     /* Console I/O file descriptor */
+#else
+  int   cn_infd;      /* Re-directed input file descriptor */
+#endif
   int   cn_errfd;     /* Re-directed error output file descriptor */
   int   cn_outfd;     /* Re-directed output file descriptor */
-  int   cn_infd;      /* Re-directed input file descriptor */
 };
 
 /****************************************************************************
@@ -438,6 +444,13 @@ FAR struct console_stdio_s *nsh_newconsole(bool isctty)
       /* Initialize the input stream */
 
       INFD(pstate)               = STDIN_FILENO;
+
+      /* Initialize current working directory */
+
+#ifdef CONFIG_DISABLE_ENVIRON
+      strlcpy(pstate->cn_vtbl.cwd, CONFIG_LIBC_HOMEDIR,
+              sizeof(pstate->cn_vtbl.cwd));
+#endif
     }
 
   return pstate;

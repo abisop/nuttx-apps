@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/system/zmodem/zm_state.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -41,7 +43,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <ctype.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <sched.h>

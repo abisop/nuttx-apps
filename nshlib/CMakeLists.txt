@@ -1,6 +1,8 @@
 # ##############################################################################
 # apps/nshlib/CMakeLists.txt
 #
+# SPDX-License-Identifier: Apache-2.0
+#
 # Licensed to the Apache Software Foundation (ASF) under one or more contributor
 # license agreements.  See the NOTICE file distributed with this work for
 # additional information regarding copyright ownership.  The ASF licenses this
@@ -96,6 +98,10 @@ if(CONFIG_NSH_LIBRARY)
 
   if(NOT CONFIG_NSH_DISABLESCRIPT)
     list(APPEND CSRCS nsh_test.c)
+  endif()
+
+  if(NOT CONFIG_NSH_DISABLE_WAIT)
+    list(APPEND CSRCS nsh_wait.c)
   endif()
 
   if(CONFIG_USBDEV)

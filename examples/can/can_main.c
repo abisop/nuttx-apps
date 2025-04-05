@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/examples/can/can_main.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -34,7 +36,6 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <debug.h>
-#include <unistd.h>
 
 #include <nuttx/can/can.h>
 
@@ -358,7 +359,7 @@ int main(int argc, FAR char *argv[])
       txmsg.cm_hdr.ch_brs    = brs;
       txmsg.cm_hdr.ch_esi    = false;
 #endif
-      txmsg.cm_hdr.ch_unused = 0;
+      txmsg.cm_hdr.ch_tcf    = 0;
 
       for (i = 0; i < msgbytes; i++)
         {

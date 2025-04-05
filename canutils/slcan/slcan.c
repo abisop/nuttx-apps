@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/canutils/slcan/slcan.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -44,7 +46,6 @@
 #include <sys/socket.h>
 #include <syslog.h>
 #include <sys/uio.h>
-#include <net/if.h>
 #include <termios.h>
 #include <nuttx/can.h>
 

@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/nshlib/nsh.h
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -39,6 +41,7 @@
 #endif
 
 #include <nuttx/usb/usbdev_trace.h>
+#include <nshlib/nshlib.h>
 
 /****************************************************************************
  * Pre-processor Definitions
@@ -374,12 +377,6 @@
 #  define NSH_ERRNO_OF(err)  (err)
 #  define NSH_HERRNO         (h_errno)
 #  define NSH_HERRNO_OF(err) (err)
-#endif
-
-/* Maximum size of one command line (telnet or serial) */
-
-#ifndef CONFIG_NSH_LINELEN
-#  define CONFIG_NSH_LINELEN 80
 #endif
 
 /* The maximum number of nested if-then[-else]-fi sequences that
@@ -858,20 +855,18 @@ int nsh_command(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char *argv[]);
 
 #ifdef CONFIG_NSH_BUILTIN_APPS
 int nsh_builtin(FAR struct nsh_vtbl_s *vtbl, FAR const char *cmd,
-                FAR char **argv, FAR const char *redirfile_in,
-                FAR const char *redirfile_out, int oflags);
+                FAR char **argv, FAR const struct nsh_param_s *param);
 #endif
 
 #ifdef CONFIG_NSH_FILE_APPS
 int nsh_fileapp(FAR struct nsh_vtbl_s *vtbl, FAR const char *cmd,
-                FAR char **argv, FAR const char *redirfile_in,
-                FAR const char *redirfile_out, int oflags);
+                FAR char **argv, FAR const struct nsh_param_s *param);
 #endif
 
-#ifndef CONFIG_DISABLE_ENVIRON
 /* Working directory support */
 
-FAR const char *nsh_getcwd(void);
+FAR const char *nsh_getcwd(FAR struct nsh_vtbl_s *vtbl);
+#ifndef CONFIG_DISABLE_ENVIRON
 FAR char *nsh_getfullpath(FAR struct nsh_vtbl_s *vtbl,
                           FAR const char *relpath);
 void nsh_freefullpath(FAR char *fullpath);
@@ -928,6 +923,9 @@ void nsh_usbtrace(void);
 #endif
 #ifndef CONFIG_NSH_DISABLE_TIME
   int cmd_time(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
+#endif
+#if !defined(CONFIG_NSH_DISABLE_TOP) && defined(NSH_HAVE_CPULOAD)
+  int cmd_top(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
 #endif
 #ifndef CONFIG_NSH_DISABLE_PS
   int cmd_ps(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
@@ -1069,14 +1067,12 @@ int cmd_irqinfo(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
 #  endif
 #endif /* !CONFIG_DISABLE_MOUNTPOINT */
 
-#if !defined(CONFIG_DISABLE_ENVIRON)
-#  ifndef CONFIG_NSH_DISABLE_CD
+#ifndef CONFIG_NSH_DISABLE_CD
   int cmd_cd(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
-#  endif
-#  ifndef CONFIG_NSH_DISABLE_PWD
+#endif
+#ifndef CONFIG_NSH_DISABLE_PWD
   int cmd_pwd(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
-#  endif
-#endif /* !CONFIG_DISABLE_MOUNTPOINT */
+#endif
 
 #ifndef CONFIG_NSH_DISABLE_ENV
   int cmd_env(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
@@ -1229,6 +1225,16 @@ int cmd_switchboot(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
 #ifdef CONFIG_NSH_ALIAS
 int cmd_alias(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
 int cmd_unalias(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
+#endif
+
+#ifndef CONFIG_NSH_DISABLE_WATCH
+int cmd_watch(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
+#endif
+
+#if !defined(CONFIG_NSH_DISABLE_WAIT) && defined(CONFIG_SCHED_WAITPID) && \
+    !defined(CONFIG_DISABLE_PTHREAD) && defined(CONFIG_FS_PROCFS) && \
+    !defined(CONFIG_FS_PROCFS_EXCLUDE_PROCESS)
+int cmd_wait(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv);
 #endif
 
 /****************************************************************************
@@ -1389,7 +1395,7 @@ int nsh_foreach_direntry(FAR struct nsh_vtbl_s *vtbl, FAR const char *cmd,
  *
  ****************************************************************************/
 
-#if defined(CONFIG_FS_PROCFS) && !defined(CONFIG_NSH_DISABLE_PIDOF)
+#ifdef CONFIG_FS_PROCFS
 ssize_t nsh_getpid(FAR struct nsh_vtbl_s *vtbl, FAR const char *name,
                    FAR pid_t *pids, size_t count);
 #endif

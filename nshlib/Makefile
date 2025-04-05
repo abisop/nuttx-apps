@@ -1,6 +1,8 @@
 ############################################################################
 # apps/nshlib/Makefile
 #
+# SPDX-License-Identifier: Apache-2.0
+#
 # Licensed to the Apache Software Foundation (ASF) under one or more
 # contributor license agreements.  See the NOTICE file distributed with
 # this work for additional information regarding copyright ownership.  The
@@ -80,6 +82,10 @@ endif
 
 ifneq ($(CONFIG_NSH_DISABLESCRIPT),y)
 CSRCS += nsh_test.c
+endif
+
+ifneq ($(CONFIG_NSH_DISABLE_WAIT),y)
+CSRCS += nsh_wait.c
 endif
 
 ifeq ($(CONFIG_USBDEV),y)

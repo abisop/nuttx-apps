@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/nshlib/nsh_fscmds.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -516,6 +518,7 @@ static int ls_handler(FAR struct nsh_vtbl_s *vtbl, FAR const char *dirpath,
 
       if ((lsflags & LSFLAGS_SIZE) != 0)
         {
+#ifdef CONFIG_HAVE_FLOAT
           if (lsflags & LSFLAGS_HUMANREADBLE && buf.st_size >= KB)
             {
               if (buf.st_size >= GB)
@@ -532,6 +535,7 @@ static int ls_handler(FAR struct nsh_vtbl_s *vtbl, FAR const char *dirpath,
                 }
             }
           else
+#endif
             {
               nsh_output(vtbl, "%12" PRIdOFF, buf.st_size);
             }
@@ -799,12 +803,22 @@ int cmd_cat(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv)
 
       while (true)
         {
-          ssize_t n = nsh_read(vtbl, buf, BUFSIZ);
+          ret = nsh_read(vtbl, buf, BUFSIZ);
+          if (ret == 0)
+            {
+              break;
+            }
+          else if (ret < 0)
+            {
+              if (errno == EINTR)
+                {
+                  continue;
+                }
 
-          if (n == 0)
-            break;
+              break;
+            }
 
-          nsh_write(vtbl, buf, n);
+          nsh_write(vtbl, buf, ret);
         }
 
       free(buf);
@@ -1535,10 +1549,11 @@ int cmd_ls(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv)
             lsflags |= LSFLAGS_SIZE;
             break;
 
+#ifdef CONFIG_HAVE_FLOAT
           case 'h':
             lsflags |= LSFLAGS_HUMANREADBLE;
             break;
-
+#endif
           case '?':
           default:
             nsh_error(vtbl, g_fmtarginvalid, argv[0]);
@@ -1565,12 +1580,7 @@ int cmd_ls(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv)
     }
   else if (optind >= argc)
     {
-#ifndef CONFIG_DISABLE_ENVIRON
-      relpath = nsh_getcwd();
-#else
-      nsh_error(vtbl, g_fmtargrequired, argv[0]);
-      return ERROR;
-#endif
+      relpath = nsh_getcwd(vtbl);
     }
   else
     {
@@ -2181,7 +2191,6 @@ int cmd_rm(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv)
   bool recursive = false;
   bool force = false;
   FAR char *fullpath;
-  char buf[PATH_MAX];
   struct stat stat;
   int ret = ERROR;
   int c;
@@ -2224,8 +2233,7 @@ int cmd_rm(FAR struct nsh_vtbl_s *vtbl, int argc, FAR char **argv)
     {
       if (recursive)
         {
-          strlcpy(buf, fullpath, PATH_MAX);
-          ret = unlink_recursive(buf, &stat);
+          ret = unlink_recursive(fullpath, &stat);
         }
       else
         {

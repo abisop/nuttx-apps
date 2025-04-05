@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/system/uorb/sensor/gnss.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -29,13 +31,30 @@
  ****************************************************************************/
 
 #ifdef CONFIG_DEBUG_UORB
-#define UORB_DEBUG_FORMAT_SENSOR_GNSS \
-  "timestamp:%" PRIu64 ",time_utc:%" PRIu64 ",latitude:%hf,longitude:%hf," \
-  "altitude:%hf,altitude_ellipsoid:%hf,eph:%hf,epv:%hf,hdop:%hf,pdop:%hf," \
-  "vdop:%hf,ground_speed:%hf,course:%hf,satellites_used:%" PRIu32 ""
+#define UORB_DEBUG_FORMAT_SENSOR_GNSS     \
+  "timestamp:%" PRIu64                    \
+  ",time_utc:%" PRIu64                    \
+  ",latitude:%hf"                         \
+  ",longitude:%hf"                        \
+  ",altitude:%hf"                         \
+  ",altitude_ellipsoid:%hf"               \
+  ",eph:%hf"                              \
+  ",epv:%hf"                              \
+  ",hdop:%hf"                             \
+  ",pdop:%hf"                             \
+  ",vdop:%hf"                             \
+  ",ground_speed:%hf"                     \
+  ",course:%hf"                           \
+  ",satellites_used:%" PRIu32 ""
+
+#define SENSOR_GNSS_SATELLITE_INFO_FORMAT(idx) \
+  ",svid" #idx ":%" PRIu32 \
+  ",elevation" #idx ":%" PRIu32 \
+  ",azimuth" #idx ":%" PRIu32 \
+  ",snr" #idx ":%" PRIu32 ""
 
 static const char sensor_gnss_format[] =
-  UORB_DEBUG_FORMAT_SENSOR_GNSS;
+  UORB_DEBUG_FORMAT_SENSOR_GNSS ",firmware_version:%" PRIu32 "";
 
 static const char sensor_gnss_clock_format[] =
   "flags:%" PRIx32 ",leap_second:%" PRId32 ",time_ns:%" PRId64 ","
@@ -62,13 +81,13 @@ static const char sensor_gnss_measurement_format[] =
 
 static const char sensor_gnss_satellite_format[] =
   "timestamp:%" PRIu64 ",count:%" PRIu32 ",satellites:%" PRIu32 ","
-  "constellation:%" PRIu32 ","
-  "svid0:%" PRIu32 ",elevation0:%" PRIu32 ",azimuth0:%" PRIu32 ","
-  "snr0:%" PRIu32 ",svid1:%" PRIu32 ",elevation1:%" PRIu32 ","
-  "azimuth1:%" PRIu32 ",snr1:%" PRIu32 ",svid2:%" PRIu32 ","
-  "elevation2:%" PRIu32 ",azimuth2:%" PRIu32 ",snr2:%" PRIu32 ","
-  "svid3:%" PRIu32 ",elevation3:%" PRIu32 ",azimuth3:%" PRIu32 ","
-  "snr3:%" PRIu32 "";
+  "constellation:%" PRIu32 ""
+  ",cf:%hf"
+  SENSOR_GNSS_SATELLITE_INFO_FORMAT(0)
+  SENSOR_GNSS_SATELLITE_INFO_FORMAT(1)
+  SENSOR_GNSS_SATELLITE_INFO_FORMAT(2)
+  SENSOR_GNSS_SATELLITE_INFO_FORMAT(3)
+  ;
 #endif
 
 /****************************************************************************

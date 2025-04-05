@@ -1,6 +1,8 @@
 /****************************************************************************
  * apps/testing/ostest/nxevent.c
  *
+ * SPDX-License-Identifier: Apache-2.0
+ *
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.  The
@@ -26,6 +28,7 @@
 #include <nuttx/event.h>
 
 #include <stdio.h>
+#include <sched.h>
 #include <pthread.h>
 
 #include "ostest.h"
@@ -278,7 +281,7 @@ void nxevent_test(void)
 
   /* Lower priority */
 
-  sparam.sched_priority = PTHREAD_DEFAULT_PRIORITY - 1;
+  sparam.sched_priority = PTHREAD_DEFAULT_PRIORITY;
   pthread_attr_setschedparam(&attr, &sparam);
 
   /* Create thread */
@@ -301,7 +304,7 @@ void nxevent_test(void)
 
   /* Lower priority */
 
-  sparam.sched_priority = PTHREAD_DEFAULT_PRIORITY - 1;
+  sparam.sched_priority = PTHREAD_DEFAULT_PRIORITY;
   pthread_attr_setschedparam(&attr, &sparam);
 
   /* Create thread */
